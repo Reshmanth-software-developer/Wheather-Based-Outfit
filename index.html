@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WeatherGPT – Conversational AI for Weather, Alerts and Climate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-sky="day" data-wx="clear">
+<div class="fx" id="fx" aria-hidden="true"></div>
+<header class="nav">
+  <a class="brand" href="#home">☁ WeatherGPT</a>
+  <button class="burger" id="burger" aria-label="Menu">☰</button>
+  <nav id="menu">
+    <a href="#home">Home</a><a href="#live">Live Weather</a><a href="#map">Map</a><a href="#forecast">Forecast</a>
+    <a href="#alerts">Weather Alerts</a><a href="#climate">Climate</a><a href="#assistant">AI Assistant</a>
+    <a href="#outfit">Outfit</a>
+  </nav>
+  <div class="toggle" role="group" aria-label="Unit">
+    <button class="on" data-unit="C">°C</button><button data-unit="F">°F</button>
+  </div>
+  <button class="btn" id="navGet">Get Weather</button>
+</header>
+
+<main>
+<section id="home" class="hero">
+  <div class="hero-text">
+    <p class="pill">☁ AI weather platform · Smart India Hackathon</p>
+    <h1>WeatherGPT</h1>
+    <p class="sub">Conversational AI for Weather Forecasting, Alerts, and Climate Information</p>
+    <p class="tag">Your intelligent weather companion for real-time forecasts, personalized alerts, climate insights, and smart recommendations.</p>
+    <div class="search glass">
+      <input id="q" placeholder="Search a city, e.g. Hyderabad" autocomplete="off" aria-label="City">
+      <button class="btn ghost" id="gps">📍 Use my location</button>
+      <ul id="suggest" class="suggest"></ul>
+    </div>
+    <div class="row">
+      <button class="btn" id="checkLive">Check Live Weather</button>
+      <a class="btn ghost" href="#assistant">Ask WeatherGPT</a>
+    </div>
+    <div class="chips" id="presets"></div>
+  </div>
+  <div class="hero-visual" aria-hidden="true">
+    <div class="sun"></div>
+    <div class="nowcard glass" id="heroNow" hidden></div>
+    <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+    <div class="float f1">💧 Rain alerts</div><div class="float f2">👕 Outfit tips</div>
+    <div class="float f3">📈 Climate insights</div><div class="float f4">🌬 Live wind</div>
+  </div>
+</section>
+
+<section id="live">
+  <h2>Live Weather</h2><p class="lead">Current conditions for your city, updated on every search.</p>
+  <div class="liveline"><span class="livedot"></span><span id="updated">Waiting for data…</span><button class="chip" id="refreshBtn">↻ Refresh now</button></div>
+  <div id="status" class="status">Loading your current weather…</div>
+  <div id="liveBox" hidden>
+    <div class="glass big">
+      <div><div id="place" class="place"></div><div id="date" class="muted"></div>
+        <div class="temp" id="temp"></div><div id="cond"></div><div class="muted" id="hilo"></div></div>
+      <div class="icon" id="icon"></div>
+    </div>
+    <div class="grid" id="cards"></div>
+  </div>
+</section>
+
+<section id="map">
+  <h2>Weather on Google Maps</h2>
+  <p class="lead">The map follows the city you search or detect, and the weather marker updates with every sync.</p>
+  <div class="glass mapbox">
+    <div class="maptools">
+      <div class="chips" id="mapType"><button class="chip on" data-t="m">Map</button><button class="chip" data-t="k">Satellite</button><button class="chip" data-t="p">Terrain</button></div>
+      <div class="chips"><button class="chip" id="zOut" aria-label="Zoom out">−</button><button class="chip" id="zIn" aria-label="Zoom in">+</button>
+        <a class="chip" id="gOpen" target="_blank" rel="noopener">Open in Google Maps ↗</a><a class="chip" id="gDir" target="_blank" rel="noopener">Directions ↗</a></div>
+    </div>
+    <div class="mapwrap">
+      <iframe id="gmap" title="Google Map of the selected city" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      <div class="pin glass" id="mapPin" hidden></div>
+      <div class="mapempty" id="mapEmpty">Load a city to see it on the map.</div>
+    </div>
+  </div>
+</section>
+
+<section id="forecast">
+  <h2>Forecast</h2><p class="lead">Hourly detail for the next 24 hours and a 7-day outlook.</p>
+  <h3>Next 24 hours</h3><div class="scroller" id="hourly"></div>
+  <div class="two">
+    <div class="glass"><h3>Temperature curve</h3><svg id="tempChart" viewBox="0 0 600 200"></svg></div>
+    <div class="glass"><h3>Rain probability</h3><svg id="rainChart" viewBox="0 0 600 200"></svg></div>
+  </div>
+  <h3>7-day outlook</h3><div class="grid" id="daily"></div>
+</section>
+
+<section id="alerts">
+  <h2>Weather Alerts</h2><p class="lead">Hazards detected from live conditions, grouped by severity.</p>
+  <div class="chips" id="sevTabs">
+    <button class="chip on" data-sev="all">All</button><button class="chip" data-sev="info">Information</button>
+    <button class="chip" data-sev="warning">Warning</button><button class="chip" data-sev="severe">Severe</button>
+  </div>
+  <div id="alertList"></div>
+  <p class="muted">Emergency helplines (India): 112 National Emergency · 1078 Disaster Management · 108 Ambulance</p>
+</section>
+
+<section id="climate">
+  <h2>Climate Information</h2><p class="lead">Long-term patterns for major Indian cities.</p>
+  <div class="chips" id="climateTabs"></div>
+  <div class="grid" id="climateCards"></div>
+  <div class="glass"><h3>Monthly rainfall (bars) and mean temperature (line)</h3><svg id="climateChart" viewBox="0 0 600 220"></svg></div>
+</section>
+
+<section id="assistant">
+  <h2>WeatherGPT AI Assistant</h2>
+  <p class="muted">Answers are generated from the live weather data of the city you loaded.</p>
+  <div class="glass chat">
+    <div id="log" class="log" aria-live="polite"></div>
+    <div class="chips" id="quick"></div>
+    <div class="send"><input id="msg" placeholder="Ask about rain, clothing, travel or climate" aria-label="Message">
+      <button class="btn" id="sendBtn">Send</button><button class="btn ghost" id="reset">Reset</button></div>
+  </div>
+</section>
+
+<section id="outfit">
+  <h2>AI Outfit Recommender</h2><p class="lead">What to wear, based on temperature, rain and wind.</p>
+  <div class="chips" id="activity"></div>
+  <div class="grid" id="outfitCards"></div>
+</section>
+
+<section id="about">
+  <h2>Technology</h2>
+  <div class="chips static"><span class="chip">Artificial Intelligence</span><span class="chip">Generative AI</span>
+    <span class="chip">Weather APIs</span><span class="chip">Open-Meteo API</span><span class="chip">HTML</span>
+    <span class="chip">CSS</span><span class="chip">JavaScript</span><span class="chip">Responsive Design</span></div>
+</section>
+</main>
+
+<footer><strong>WeatherGPT</strong> — AI-powered weather intelligence for everyone.
+  <div><a href="#home">Home</a> | <a href="#forecast">Forecast</a> | <a href="#alerts">Alerts</a> | <a href="#climate">Climate</a> | <a href="#assistant">AI Assistant</a> | <a href="#about">About</a></div></footer>
+<script src="app.js"></script>
+</body>
+</html>
